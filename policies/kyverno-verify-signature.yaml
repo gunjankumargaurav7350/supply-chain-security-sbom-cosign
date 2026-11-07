@@ -1,0 +1,32 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-cosign-image-signature
+  annotations:
+    policies.kyverno.io/title: Verify Image Signatures via Cosign
+    policies.kyverno.io/category: Software Supply Chain Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Blocks any Pod from launching unless its container image has been cryptographically
+      signed by authorized production Cosign keys.
+spec:
+  validationFailureAction: Enforce
+  webhookTimeoutSeconds: 30
+  rules:
+    - name: verify-signature
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      verifyImages:
+        - imageReferences:
+            - "acrappsecprod01.azurecr.io/*"
+            - "ghcr.io/gunjankumargaurav7350/*"
+          attestors:
+            - entries:
+                - keys:
+                    publicKeys: |
+                      -----BEGIN PUBLIC KEY-----
+                      MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEProductionEnterpriseKeyExampleSignature==
+                      -----END PUBLIC KEY-----

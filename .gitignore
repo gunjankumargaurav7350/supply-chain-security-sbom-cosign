@@ -1,0 +1,7 @@
+*.tar
+*.spdx.json
+*.cyclonedx.json
+sbom/
+reports/
+*.key
+*.pub

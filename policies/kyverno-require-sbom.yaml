@@ -1,0 +1,22 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-sbom-attestation
+  annotations:
+    policies.kyverno.io/title: Require Attached SBOM Attestation
+    policies.kyverno.io/category: Supply Chain Compliance
+    policies.kyverno.io/description: Enforces that every image deployed has an attached Syft SPDX/CycloneDX SBOM.
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: check-image-attestations
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      verifyImages:
+        - imageReferences:
+            - "*"
+          attestations:
+            - predicateType: https://spdx.dev/Document
